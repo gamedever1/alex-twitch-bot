@@ -73,18 +73,21 @@ regxs = {
 
 ```bash
 python -m venv venv
-
-# На Windows
-venv/Scripts/activate.bat
-
-# На Linux/macOS
+```
+- Для Windows
+```bash
+call venv/Scripts/activate
+```
+- Для Linux-систем
+```bash
 source venv/bin/activate
 ```
-
+- Установка зависимостей
 ```bash
 pip install -r requirements.txt
 ```
-```
+- Запуск чат-бота
+```bash
 python alextbot.py
 ```
 
