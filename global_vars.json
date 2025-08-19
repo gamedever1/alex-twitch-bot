@@ -1,0 +1,17 @@
+{
+  "openaikey": "sk-YOUR-OPENAI-TOKEN",
+  "proxies": {
+    "http": "",
+    "https": ""
+  },
+  "vk_token": "1e9439d296cb614cf0d975391a2e81529b9e5b1d564a27fff55411fbbc0615903e9eab8f488401b0e737d",
+  "vk_group_id": 209525263,
+  "game_lvl": 52,
+  "user": {
+    "username": "StreamNord",
+    "token": "wjqeayphz37o9ci7ru9udz0ll0nd5u"
+  },
+  "channels": [
+    "#StreamNord"
+  ]
+}
