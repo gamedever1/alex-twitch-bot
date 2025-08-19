@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import json, sys, re, asyncio, threading
+import json, requests, sys, re, asyncio, threading
 from time import gmtime, strftime
 from datetime import datetime
-import requests, openai, irc.bot
+import openai
+import irc.bot
 from appJar import gui
 
 # Открываем конфиг из файла, или закрываем программу, если файла нет
@@ -20,7 +21,7 @@ OPENAI_KEY   = cfg.get('openaikey', '')   # ключ OpenAI для GPT-запр�
 PROXIES_RAW  = cfg.get('proxies', {"http": "", "https": ""})   # адреса прокси (если пустая строка - не использовать прокси)
 VK_TOKEN_DEF = cfg.get('vk_token', '')   # VK-токен для api
 VK_GROUP_ID  = str(cfg.get('vk_group_id', '')).strip()   # VK group_id в которой музыка (если пустая строка - api VK отключён)
-GAME_LVL     = str(cfg.get('game_lvl', '52'))   # уровень игры
+GAME_LVL     = str(cfg.get('game_lvl', '52'))   # уровень какой-нибудь игры, который берется из конфиг файла
 USER         = cfg.get('user', {"username": "", "token": ""})   # Twitch-логин и токен
 CHANNELS     = cfg.get('channels', [])   # Twitch-каналы, к которым подключиться
 
@@ -33,11 +34,10 @@ if isinstance(PROXIES_RAW, dict):
 
 # Команды по regex: ключ = имя, [0] = regex, [1] = ответ/шаблон
 regxs = {
-    'tg1':        [r"^!(tg|telegram|тг|телега|телеграм|тегешка)\W{0,2}$", " ~ Telegram -> t-me/stream_collection"],
-    'donat1':     [r"^!(donate|донат|donation)\W{0,2}$", " ~ Donate -> donationalerts com/r/streamer"],
-    'mustrack1':  [r"^!(music|song|track|трек|музыка|песня)\W{0,2}$", " ~ Music not found."],   # если VK отключён/пусто так и отвечаем
-    'crosshair1': [r"^!(crosshair|прицел)\W{0,2}$", " ~ Прицел -> CSGO-Q6MFP-rNTJq-xpOTr-k66Ui-8HH8D"],
-    'gamelevel1': [r"((^!level\W{0,2})|(^!lvl\W{0,2}))$", " ~ Genshin Level -> " + GAME_LVL],
+    'tg1':        [r"^!(tg|telegram|тг|телега|телеграм|тегешка)\W{0,2}$", ' ~ Telegram -> @streamer_tg'],
+    'donat1':     [r"^!(donate|донат|donation)\W{0,2}$", ' ~ Donate -> donationalerts.com/r/streamer'],
+    'mustrack1':  [r"^!(music|song|track|трек|музыка|песня)\W{0,2}$", " ~ Music not found."],   # если VK отключён/пусто пишет not found
+    'gamelevel1': [r"((^!level\W{0,2})|(^!lvl\W{0,2}))$", " ~ Genshin Level -> " + GAME_LVL], # Genshin можно поменять на любую другую игру, число уровня берется из конфига
 }
 
 # Антиспам: интервал ответов в секундах
@@ -58,8 +58,7 @@ async def chatgpt_request(prompt):   # отправляет запрос в Open
                 "model": "gpt-4o-mini",
                 "messages": [
                     {"role": "system", "content": " Ты - ассистент чат-бот на стриме, отвечающий на вопросы об известных людях. Отвечай кратко и без лишнего."},
-                    {"role": "system", "content": "Основная информация о nenormova: имя Анна, ей 20 лет, Москва, стримит на Twitch."},
-                    {"role": "system", "content": "Доп. информация: модератор mr.mod, второй канал girl_game"},
+                    {"role": "system", "content": "Основная информация о стримере Buster: Вячеслав Андреевич Леонтьев, родился 25 февраля 1997 года, Москва, стримит на Twitch."},
                     {"role": "user", "content": prompt}
                 ]
             },
